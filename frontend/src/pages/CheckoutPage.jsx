@@ -56,34 +56,40 @@ const CheckoutPage = () => {
         return;
       }
 
-      // 2. Create Order in our backend
-      const orderRes = await orderAPI.createOrder({ shippingAddress: data });
-      const order = orderRes.data.data;
-
-      // 3. Create Razorpay Order
-      const rzpOrderRes = await paymentAPI.createOrder(order.total);
+      // 2. Create Razorpay Order
+      const rzpOrderRes = await paymentAPI.createOrder(cart.totalAmount);
       const { orderId: rzpOrderId, amount, currency, keyId } = rzpOrderRes.data.data;
 
-      // 4. Initialize Razorpay Checkout
+      // 3. Initialize Razorpay Checkout
       const options = {
         key: keyId,
         amount: amount,
         currency: currency,
         name: 'LUXE BREW',
-        description: `Order #${order.orderNumber}`,
+        description: `Checkout`,
         order_id: rzpOrderId,
         handler: async function (response) {
           try {
-            // 5. Verify payment
+            // 4. Verify payment
             await paymentAPI.verifyPayment({
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
+
+            // 5. Create Order in our backend
+            const orderRes = await orderAPI.createOrder({
+              shippingDetails: data,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              paymentAmount: cart.totalAmount,
+            });
+
             resetCart();
-            navigate(`/payment/success?orderId=${order.id}`);
+            navigate(`/payment/success?orderId=${orderRes.data.data.id}`);
           } catch (err) {
-            navigate(`/payment/failure?orderId=${order.id}`);
+            navigate(`/payment/failure`);
           }
         },
         prefill: {
@@ -98,7 +104,7 @@ const CheckoutPage = () => {
 
       const paymentObject = new window.Razorpay(options);
       paymentObject.on('payment.failed', function (response) {
-        navigate(`/payment/failure?orderId=${order.id}`);
+        navigate(`/payment/failure`);
       });
       paymentObject.open();
 
