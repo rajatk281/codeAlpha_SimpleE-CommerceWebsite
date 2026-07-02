@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: luxebrew_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-luxebrew}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-luxebrew_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-luxebrew_db}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - luxebrew_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-luxebrew}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: luxebrew_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-luxebrew}:${POSTGRES_PASSWORD:-luxebrew_secret}@postgres:5432/${POSTGRES_DB:-luxebrew_db}?schema=public
+    ports:
+      - '5000:5000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - luxebrew_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: luxebrew_frontend
+    restart: unless-stopped
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+    networks:
+      - luxebrew_network
+
+volumes:
+  postgres_data:
+
+networks:
+  luxebrew_network:
+    driver: bridge
