@@ -12,7 +12,7 @@ const env = {
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
   RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
   RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
-  FRONTEND_URL: process.env.FRONTEND_URL || 'https://code-alpha-simple-e-commerce-websit.vercel.app',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'https://code-alpha-simple-e-commerce-websit.vercel.app, https://code-alpha-simple-e-commerce-web-git-561025-nnobittaas-projects.vercel.app, http://localhost:5173',
 };
 
 module.exports = env;
