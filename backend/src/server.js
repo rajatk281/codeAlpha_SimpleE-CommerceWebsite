@@ -12,7 +12,7 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
-      logger.info(`Health check: http://localhost:${PORT}/api/health`);
+      logger.info(`Health check: https://codealpha-simplee-commercewebsite.onrender.com/api/health`);
     });
   } catch (error) {
     logger.error(`Failed to start server: ${error.message}`);

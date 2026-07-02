@@ -17,7 +17,7 @@ async function measure() {
   // 2. Login to get token
   let token;
   try {
-    const res = await axios.post('http://localhost:8000/api/auth/login', {
+    const res = await axios.post('https://codealpha-simplee-commercewebsite.onrender.com/api/auth/login', {
       email: 'user@luxebrew.com',
       password: 'user123'
     });
@@ -33,7 +33,7 @@ async function measure() {
   console.log('\nMeasuring POST /api/cart/items ...');
   const startCart = performance.now();
   try {
-    await axios.post('http://localhost:8000/api/cart/items', {
+    await axios.post('https://codealpha-simplee-commercewebsite.onrender.com/api/cart/items', {
       productId: product.id,
       quantity: 1
     }, { headers });
@@ -45,7 +45,7 @@ async function measure() {
   console.log('\nMeasuring POST /api/wishlist ...');
   const startWishlist = performance.now();
   try {
-    await axios.post('http://localhost:8000/api/wishlist', {
+    await axios.post('https://codealpha-simplee-commercewebsite.onrender.com/api/wishlist', {
       productId: product.id
     }, { headers });
   } catch(e) {}
